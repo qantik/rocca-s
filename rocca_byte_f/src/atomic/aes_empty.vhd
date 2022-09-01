@@ -5,9 +5,6 @@ use ieee.numeric_std.all;
 entity aes_empty is
     port (clk : in std_logic;
 
-          cycle : in unsigned(3 downto 0);
-          round : in unsigned(3 downto 0);
-
           input  : in  std_logic_vector(7 downto 0);
           output : out std_logic_vector(7 downto 0));
 end entity;
@@ -53,38 +50,6 @@ begin
 
         state_tmp := state;
         head := input;
-
-        --if cycle = 15 then
-        --    head         := state_tmp(0) xor key;
-        --    state_tmp(0) := state_tmp(1);
-        --    state_tmp(1) := state_tmp(2);
-
-        --    state_tmp(14) := mix_out(31 downto 24);
-        --    state_tmp(10) := mix_out(23 downto 16);
-        --    state_tmp(6)  := mix_out(15 downto 8);
-        --    state_tmp(2)  := mix_out(7 downto 0);
-        -- elsif (cycle = 0 or cycle = 1 or cycle = 2) then
-        --    state_tmp(14) := mix_out(31 downto 24);
-        --    state_tmp(10) := mix_out(23 downto 16);
-        --    state_tmp(6)  := mix_out(15 downto 8);
-        --    state_tmp(2)  := mix_out(7 downto 0);
-
-        -- elsif cycle = 8 then
-        --    tmp1 := state_tmp(3);
-
-        --    state_tmp(3) := state_tmp(2);
-        --    state_tmp(2) := state_tmp(1);
-        --    state_tmp(1) := state_tmp(0);
-        --    state_tmp(0) := tmp1;
-        -- elsif cycle = 12 then
-        --    tmp1 := state_tmp(3);
-        --    tmp2 := state_tmp(2);
-
-        --    state_tmp(3) := state_tmp(1);
-        --    state_tmp(2) := state_tmp(0);
-        --    state_tmp(1) := tmp1;
-        --    state_tmp(0) := tmp2;
-        --end if;
 
         state_tmp  := state_tmp(14 downto 0) & head;
         state_next <= state_tmp;

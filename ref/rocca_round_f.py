@@ -118,7 +118,7 @@ def encrypt(n, ad, msg, k):
     if adlen > 0:
         absorbad(s, ad0, ad1, adlen)
     if msglen > 0:
-        ct = absorbmsg(s, msg0, msg1, msglen, 4)
+        ct = absorbmsg(s, msg0, msg1, msglen, 0)
     t = outputtag(s, k0, k1, adlen, msglen) 
     return ct, t
 
