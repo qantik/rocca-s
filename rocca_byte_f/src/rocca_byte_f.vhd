@@ -77,7 +77,7 @@ begin
         aes_in(5) <= nonce xor k1;
         aes_in(6) <= (others => '0');
 
-        if state /= load_state then
+        if state /= load_state and state /= msg_pre_state then
             
             aes_in(0) <= aes_out(0);
             aes_in(1) <= aes_out(1);
@@ -87,7 +87,10 @@ begin
             aes_in(5) <= aes_out(5);
             aes_in(6) <= aes_out(6);
 
-            if epoch = 1 then
+            if epoch = 0 and state = msg_post_state then 
+                aes_in(3) <= aes_out(3) xor aes_out(5);
+                aes_in(4) <= aes_out(4) xor aes_out(6);
+            elsif epoch = 1 then
                 aes_in(2) <= aes_out(2) xor aes_out(6);
                 aes_in(5) <= aes_out(5) xor aes_out(4);
                 aes_in(6) <= aes_out(6) xor aes_out(1);
@@ -103,7 +106,20 @@ begin
                 aes_in(5) <= aes_out(4) xor (k0 and k_mask1);
                 aes_in(6) <= aes_out(5) xor (k1 and k_mask1);
             end if;
+        elsif state = msg_pre_state then
+                aes_in(0) <= aes_out(0);
+                aes_in(1) <= aes_out(1);
+                aes_in(2) <= aes_out(2);
+                aes_in(3) <= aes_out(3);
+                aes_in(4) <= aes_out(4);
+                aes_in(5) <= aes_out(5);
+                aes_in(6) <= aes_out(6);
+            if epoch = 0 then
+                aes_in(3) <= aes_out(3) xor aes_out(5);
+                aes_in(4) <= aes_out(4) xor aes_out(6);
+            end if;
         end if;
+
     
     end process;
 
@@ -126,8 +142,8 @@ begin
                 aes_enc_en(3) <= '1';
             elsif cycle = 63 then
                 if round = 15 and ad_empty = '1' and msg_empty = '0' then
-                    aes_enc_en(2) <= '1';
-                    aes_enc_en(5) <= '1';
+                    aes_enc_en(3) <= '1';
+                    aes_enc_en(4) <= '1';
                 else
                     aes_enc_en(2) <= '1';
                     aes_enc_en(5) <= '1';
@@ -142,8 +158,8 @@ begin
                 aes_enc_en(3) <= '1';
             elsif cycle = 63 then
                 if last_block = '1' and msg_empty = '0' then
-                    aes_enc_en(2) <= '1';
-                    aes_enc_en(5) <= '1';
+                    aes_enc_en(3) <= '1';
+                    aes_enc_en(4) <= '1';
                 else
                     aes_enc_en(2) <= '1';
                     aes_enc_en(5) <= '1';
@@ -154,8 +170,8 @@ begin
                 aes_dec_en(3) <= '1';
                 aes_dec_en(4) <= '1';
             elsif cycle = 31 then
-                aes_enc_en(1) <= '1';
-                aes_enc_en(4) <= '1';
+                aes_enc_en(2) <= '1';
+                aes_enc_en(5) <= '1';
             end if;
         elsif state = msg_post_state then
             if cycle = 15 then
@@ -169,8 +185,8 @@ begin
                     aes_enc_en(2) <= '1';
                     aes_enc_en(5) <= '1';
                 else 
-                    aes_enc_en(2) <= '1';
-                    aes_enc_en(5) <= '1';
+                    aes_enc_en(3) <= '1';
+                    aes_enc_en(4) <= '1';
                 end if;
             end if;
         elsif state = tag_state then
@@ -187,12 +203,12 @@ begin
         end if;
     end process;
     
-    aes0_gen : entity work.aes port map (clk, aes_enc_en(0), aes_in(0), aes_out(0));
-    aes1_gen : entity work.aes port map (clk, aes_enc_en(1), aes_in(1), aes_out(1));
-    aes2_gen : entity work.aes port map (clk, aes_enc_en(2), aes_in(2), aes_out(2));
-    aes3_gen : entity work.aes port map (clk, aes_enc_en(3), aes_in(3), aes_out(3));
-    aes4_gen : entity work.aes port map (clk, aes_enc_en(4), aes_in(4), aes_out(4));
-    aes5_gen : entity work.aes port map (clk, aes_enc_en(5), aes_in(5), aes_out(5));
+    aes0_gen : entity work.aes port map (clk, reset_n, aes_enc_en(0), aes_in(0), aes_out(0));
+    aes1_gen : entity work.aes port map (clk, reset_n, aes_enc_en(1), aes_in(1), aes_out(1));
+    aes2_gen : entity work.aes port map (clk, reset_n, aes_enc_en(2), aes_in(2), aes_out(2));
+    aes3_gen : entity work.aes_full port map (clk, reset_n, aes_enc_en(3), aes_dec_en(3), aes_in(3), aes_out(3));
+    aes4_gen : entity work.aes_full port map (clk, reset_n, aes_enc_en(4), aes_dec_en(4), aes_in(4), aes_out(4));
+    aes5_gen : entity work.aes port map (clk, reset_n, aes_enc_en(5), aes_in(5), aes_out(5));
     aes6_gen : entity work.aes_empty port map (clk, aes_in(6), aes_out(6));
 
     cont : entity work.controller port map (

@@ -173,7 +173,7 @@ begin
 
                 if i = v_msg_len-1 then last_block <= '1'; else last_block <= '0'; end if;
 
-                msg_loop1 : for j in 0 to 63 loop
+                msg_loop1 : for j in 0 to 95 loop
                     t := 8*(j mod 16);
                     
                     nonce <= v_nonce(127-t downto 120-t);

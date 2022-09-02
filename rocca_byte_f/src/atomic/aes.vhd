@@ -3,7 +3,8 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity aes is
-    port (clk   : in std_logic;
+    port (clk     : in std_logic;
+          reset_n : in std_logic;
 
           aes_en : in std_logic;
           input  : in  std_logic_vector(7 downto 0);
@@ -37,10 +38,10 @@ begin
     sbox_in <= input;
     output  <= state(15);
 
-    --sbox      : entity work.sbox port map (sbox_in, sbox_out);
-    sbox0      : entity work.sbox_combined port map (sbox_in, zi, sbox_out1);
-    sbox1      : entity work.sbox_combined port map (sbox_out1, zf, sbox_out2);
-    sbox2      : entity work.sbox_combined port map (sbox_out2, zf, sbox_out);
+    sbox      : entity work.sbox port map (sbox_in, sbox_out);
+    --sbox0      : entity work.sbox_combined port map (sbox_in, zi, sbox_out1);
+    --sbox1      : entity work.sbox_combined port map (sbox_out1, zf, sbox_out2);
+    --sbox2      : entity work.sbox_combined port map (sbox_out2, zf, sbox_out);
     mixcolumn : entity work.mixcolumn2 port map (mix_in, mix_out);
     --iii       : entity work.invmixcolumn2 port map (mix_in, lala);
     --mixcolumn0 : entity work.mixcolumn2 port map (lala, lele);
@@ -50,7 +51,10 @@ begin
 
     cycle_reg : process(all)
     begin
-        if rising_edge(clk) then
+        if reset_n = '0' then
+            enc_en    <= '0';
+            enc_cycle <= (others => '0');
+        elsif rising_edge(clk) then
             if aes_en = '1' then
                 enc_cycle <= (others => '0');
                 enc_en    <= '1';

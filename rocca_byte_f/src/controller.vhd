@@ -84,7 +84,7 @@ begin
                     if ad_empty = '0' then
                         next_state <= ad_state;
                     elsif msg_empty = '0' then
-                        next_state <= msg_post_state;
+                        next_state <= msg_pre_state;
                     else
                         next_state <= tag_state;
                     end if;
@@ -95,7 +95,7 @@ begin
 
                 if cycle = 63 and last_block = '1' then
                     if msg_empty = '0' then
-                        next_state <= msg_post_state;
+                        next_state <= msg_pre_state;
                     else
                         next_state <= tag_state;
                     end if;
@@ -115,6 +115,8 @@ begin
                 if cycle = 63 then
                     if last_block = '1' then
                         next_state <= tag_state;
+                    else
+                        next_state <= msg_pre_state;
                     end if;
                 end if;
 
