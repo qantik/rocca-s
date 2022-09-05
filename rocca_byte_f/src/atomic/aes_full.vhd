@@ -25,9 +25,6 @@ architecture behavioural of aes_full is
     signal sbox_in_d, sbox_out_d : std_logic_vector(7 downto 0);
     signal mix_in, mix_out, mix_out1, mix_out2   : std_logic_vector(31 downto 0);
     signal mix_in_d, mix_out_d : std_logic_vector(31 downto 0);
-    signal lala, lele   : std_logic_vector(31 downto 0);
-
-    signal inhibit : std_logic_vector(1 downto 0);
 
     signal enc_cycle  : unsigned(4 downto 0);
     signal enc_en     : std_logic;
@@ -42,7 +39,7 @@ begin
         
     sbox_in <= input;
     sbox_in_d <= state(15);
-        
+
     output <= sbox_out_d when dec_en = '1' and dec_cycle >= 16 else state(15);
     
     sbox   : entity work.sbox_combined port map (sbox_in, zf, sbox_out);
@@ -164,12 +161,6 @@ begin
             end if;
             -- shift row 1
             if dec_cycle = 15 then
-                --tmp1          := head;
-                --head          := state_tmp(3);
-                --state_tmp(3)  := state_tmp(7);
-                --state_tmp(7)  := state_tmp(11);
-                --state_tmp(11) := tmp1;
-
                 tmp1 := state_tmp(1);
                 state_tmp(1) := state_tmp(5);
                 state_tmp(5) := state_tmp(9);
@@ -177,12 +168,6 @@ begin
                 state_tmp(13) := tmp1;
             -- shift row 2
             elsif dec_cycle = 16 then
-                --tmp1          := head;
-                --tmp2          := state_tmp(3);
-                --head          := state_tmp(7);
-                --state_tmp(3)  := state_tmp(11);
-                --state_tmp(7)  := tmp1;
-                --state_tmp(11) := tmp2;
                 tmp1 := state_tmp(1);
                 tmp2 := state_tmp(5);
                 state_tmp(1) := state_tmp(9);
@@ -191,13 +176,6 @@ begin
                 state_tmp(13) := tmp2;
             -- shift row 3 and first mc
             elsif dec_cycle = 17 then
-                --tmp1          := head;
-                --tmp2          := state_tmp(3);
-                --tmp3          := state_tmp(7);
-                --head          := state_tmp(11);
-                --state_tmp(3)  := tmp1;
-                --state_tmp(7)  := tmp2;
-                --state_tmp(11) := tmp3;
                 tmp1 := state_tmp(1);
                 tmp2 := state_tmp(5);
                 tmp3 := state_tmp(9);

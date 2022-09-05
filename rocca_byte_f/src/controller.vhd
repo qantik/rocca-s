@@ -29,8 +29,6 @@ begin
 
     cycle <= counter(5 downto 0);
     round <= counter(9 downto 6);
-    --cycle <= resize(counter mod 48, 6);
-    --round <= resize(counter / 48, 4);
 
     counter_reg : process(all)
     begin

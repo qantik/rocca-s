@@ -39,15 +39,7 @@ begin
     output  <= state(15);
 
     sbox      : entity work.sbox port map (sbox_in, sbox_out);
-    --sbox0      : entity work.sbox_combined port map (sbox_in, zi, sbox_out1);
-    --sbox1      : entity work.sbox_combined port map (sbox_out1, zf, sbox_out2);
-    --sbox2      : entity work.sbox_combined port map (sbox_out2, zf, sbox_out);
     mixcolumn : entity work.mixcolumn2 port map (mix_in, mix_out);
-    --iii       : entity work.invmixcolumn2 port map (mix_in, lala);
-    --mixcolumn0 : entity work.mixcolumn2 port map (lala, lele);
-    --mixcolumn1 : entity work.mixcolumn2 port map (lele, mix_out2);
-
-    --mix_out <= (others => '0') when mix_out1 /= mix_out2 else mix_out1;
 
     cycle_reg : process(all)
     begin
@@ -86,10 +78,10 @@ begin
         head      := input;
         mix_in <= state_tmp(14) & state_tmp(13) & state_tmp(12) & state_tmp(11);
 
-        if enc_en = '1' and enc_cycle < 16 then
-        --if enable0 = '1' then
-            head      := sbox_out;
-            -- shift row 1
+        if enc_en = '1' then
+            if enc_cycle < 16 then
+                head      := sbox_out;
+            end if;
             --if cycle = 13 then
             if enc_cycle = 13 then
                 tmp1 := state_tmp(11);
@@ -98,7 +90,6 @@ begin
                 state_tmp(3) := sbox_out;
                 head := tmp1;
             -- shift row 2
-             --elsif cycle = 14 then
              elsif enc_cycle = 14 then
                 tmp1 := state_tmp(11);
                 tmp2 := state_tmp(7);
@@ -108,7 +99,6 @@ begin
                 state_tmp(3) := tmp1;
                 head := tmp2;
             -- shift row 3 and first mc
-            --elsif cycle = 15 then
             elsif enc_cycle = 15 then
                 tmp1 := state_tmp(11);
                 tmp2 := state_tmp(7);
@@ -126,15 +116,13 @@ begin
                 state_tmp(12) := mix_out(15 downto 8); 
                 state_tmp(11) := mix_out(7 downto 0); 
             end if;
-        end if;
             
-        --if enable1 = '1' and (cycle = 3 or cycle = 7 or cycle = 11) then
-        if enc_en = '1' and (enc_cycle = 19 or enc_cycle = 23 or enc_cycle = 27) then
-            state_tmp(14) := mix_out(31 downto 24); 
-            state_tmp(13) := mix_out(23 downto 16); 
-            state_tmp(12) := mix_out(15 downto 8); 
-            state_tmp(11) := mix_out(7 downto 0); 
-        --end if;
+            if enc_cycle = 19 or enc_cycle = 23 or enc_cycle = 27 then
+                state_tmp(14) := mix_out(31 downto 24); 
+                state_tmp(13) := mix_out(23 downto 16); 
+                state_tmp(12) := mix_out(15 downto 8); 
+                state_tmp(11) := mix_out(7 downto 0); 
+            end if;
         end if;
 
         state_tmp  := state_tmp(14 downto 0) & head;

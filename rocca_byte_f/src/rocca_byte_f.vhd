@@ -50,9 +50,6 @@ begin
     cycle <= counter(5 downto 0);
     round <= counter(9 downto 6);
     epoch <= counter(5) & counter(4);
-    --cycle <= resize(counter mod 48, 6);
-    --round <= resize(counter / 48, 4);
-    --epoch <= cycle(5) & cycle(4);
 
     k0 <= key(15 downto 8);  k1 <= key(7 downto 0);
     d0 <= data(15 downto 8); d1 <= data(7 downto 0);
@@ -119,7 +116,6 @@ begin
                 aes_in(4) <= aes_out(4) xor aes_out(6);
             end if;
         end if;
-
     
     end process;
 
@@ -215,9 +211,11 @@ begin
         clk, reset_n, start, last_block, ad_empty, msg_empty, counter, state
     );
 
-    ct <= (others => '0');
+    ct_gen : entity  work.ctgen port map (
+        aes_out(3), aes_out(4), aes_out(0), aes_out(5), d0, d1, ct
+    );
 
-    tg : entity work.taggen port map (
+    tag_gen : entity work.taggen port map (
         aes_out(0), aes_out(1), aes_out(2), aes_out(3), aes_out(4), aes_out(5), aes_out(6), tag
     );
 
