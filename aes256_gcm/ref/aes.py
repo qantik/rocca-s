@@ -113,15 +113,33 @@ def aes(x, k):
     """
     rkeys = keyschedule(k)
 
+    print(bytes2hex(x))
     addroundkey(x, rkeys[0])
     for i in range(1, 15):
         print(bytes2hex(x))
         roundfunction(x, rkeys[i], i==14)
-    print(bytes2hex(x))
 
-x = int2bytes(0x00112233445566778899AABBCCDDEEFF, 128)
-k = int2bytes(0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f, 256)
-aes(x, k)
+    print(bytes2hex(x))
+    print()
+#from random import randint
+#for i in range(10):
+#    x = [ randint(0,255) for _ in range(16) ]
+#    k = [ randint(0,255) for _ in range(32) ]
+#    print(i)
+#    print(bytes2hex(k))
+#    print(bytes2hex(x))
+#    #x = int2bytes(0x00112233445566778899AABBCCDDEEFF, 128)
+#    #k = int2bytes(0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f, 256)
+#    aes(x, k)
+#    print(bytes2hex(x))
+
+#x = int2bytes(0x00112233445566778899AABBCCDDEEFF, 128)
+#k = int2bytes(0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f, 256)
+#print(i)
+#print(bytes2hex(k))
+#print(bytes2hex(x))
+#aes(x, k)
+#print(bytes2hex(x))
 
 #if __name__ == "__main__":
 #    import doctest

@@ -12,9 +12,12 @@ entity aes is
     port (clk     : in std_logic;
           reset_n : in std_logic;
 
+          start : in std_logic;
+
           key : in  std_logic_vector(255 downto 0);
           pt  : in  std_logic_vector(127 downto 0);
-          ct  : out std_logic_vector(127 downto 0));
+          ct  : out std_logic_vector(127 downto 0);
+          cycle : in unsigned(3 downto 0));
 end entity;
 
 architecture structural of aes is
@@ -28,27 +31,42 @@ architecture structural of aes is
     signal key_in, key_out, ks_out     : std_logic_vector(255 downto 0);
     signal roundkey : std_logic_vector(127 downto 0);
 
-    signal load : std_logic;
+    signal run  : std_logic;
 
-    signal cycle : unsigned(3 downto 0);
+    --signal cycle : unsigned(3 downto 0);
 
 begin
 
-    counter : process(clk, reset_n)
+    --counter : process(clk, reset_n)
+    --begin
+    --    if reset_n = '0' then
+    --        cycle <= "0000";
+    --    elsif rising_edge(clk) then
+    --        if run = '1' then
+    --            cycle <= (cycle + 1) mod 15;
+    --        end if;
+    --    end if;
+    --end process;
+
+    run_reg : process(clk, reset_n)
     begin
         if reset_n = '0' then
-            cycle <= "0000";
+            run <= '0';
         elsif rising_edge(clk) then
-            cycle <= (cycle + 1) mod 15;
+            if start = '1' then
+                run <= '1';
+            elsif cycle = 14 then
+                run <= '0';
+            end if;
         end if;
     end process;
 
     ct       <= state_out;
     roundkey <= key_out(127 downto 0);
-    load     <= '1' when cycle = 0 else '0';
 
-    state_in <= key(255 downto 128) xor pt when load = '1' else shiftrows_out xor roundkey when cycle = 14 else rf_out;
-    key_in   <= key        when load = '1' else ks_out;
+    state_in <= key(255 downto 128) xor pt when start = '1' else
+                shiftrows_out xor roundkey when cycle = 14  else rf_out;
+    key_in   <= key when start = '1' else ks_out;
 
     state_reg : entity reg generic map (128) port map (clk, reset_n, state_in, state_out);
     key_reg   : entity reg generic map (256) port map (clk, reset_n, key_in, key_out);

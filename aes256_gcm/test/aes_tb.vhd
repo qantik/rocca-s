@@ -28,6 +28,8 @@ architecture test of aes_tb is
     signal clk     : std_logic;
     signal reset_n : std_logic;
     
+    signal start : std_logic;
+    
     signal key : std_logic_vector(255 downto 0);
     signal pt  : std_logic_vector(127 downto 0);
 
@@ -42,6 +44,8 @@ begin
     uut : entity work.aes
         port map (clk       => clk,
                   reset_n   => reset_n,
+
+                  start => start,
                   
                   key       => key,
                   pt        => pt,
@@ -70,17 +74,25 @@ begin
                       constant v_pt  : in std_logic_vector(127 downto 0); 
                       constant v_ct  : in std_logic_vector(127 downto 0)) is
 	    begin
-	        key <= v_key;
-            pt  <= v_pt;
+	        key   <= v_key;
+            pt    <= v_pt;
+            start <= '0';
 
 	        reset_n <= '0';
             wait for reset_period;
             reset_n <= '1';
             wait for clk_period - reset_period;
 
+            wait for 1.55*clk_period;
+            start <= '1';
+            wait for clk_period;
+            start <= '0';
+
             wait for (14)*clk_period; -- initialization
 
             assert vector_equal(ct, v_ct) report "wrong tag" severity failure;
+            
+            wait for (1.95)*clk_period; -- initialization
 	    	
         end procedure run;
         

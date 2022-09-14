@@ -4,7 +4,7 @@ use ieee.std_logic_1164.all;
 package aes256_gcm_pkg is
 
     -- unrolling factor
-    constant r : integer := 1;
+    constant r : integer := 2;
 
     -- Convenience array representing the seven 128-bit Rocca-S states.
     type state_t_arr is array (0 to 5) of std_logic_vector(127 downto 0);
@@ -27,6 +27,6 @@ package aes256_gcm_pkg is
     --  3. Maximov's world record smallest circuit [IACR-EPRINT].
     type mc_t_enum is (mc_simple_e, mc_fast_e, mc_small_e);
     
-    --type state_type is (idle_state, init_state, ad_state, msg_state, tag_state);
+    type state_type is (idle_state, hk_state, tg_state, ad_state, msg_state, tag_state);
 
 end package;

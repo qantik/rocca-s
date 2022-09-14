@@ -35,11 +35,13 @@ def encrypt(ad, msg, key, iv):
     # hash key
     h = int2bytes(0x00, 128)
     aes.aes(h, key)
+    print("h", bytes2hex(h))
 
     # tag key
     count = 0x01
     t = iv + int2bytes(count, 32)
     aes.aes(t, key)
+    print("t", bytes2hex(t))
   
     x = int2bytes(0x00, 128)
     for i in range(adlen):
@@ -54,8 +56,10 @@ def encrypt(ad, msg, key, iv):
         c = _xor(z, msg[i])
         ct.append(c)
 
+        print("x", bytes2hex(x))
         x = _xor(x, c)
         x = gf_2_128_mul(x, h)
+        print("x", bytes2hex(x))
 
     l = int2bytes((adlen << (7 + 64)) | msglen << 7, 128)
     x = _xor(x, l)
@@ -65,12 +69,16 @@ def encrypt(ad, msg, key, iv):
     return ct, x
 
 
-#k = int2bytes(0x37ccdba1d929d6436c16bba5b5ff34deec88ed7df3d15d0f4ddf80c0c731ee1f, 256)
-#iv = int2bytes(0x5c1b21c8998ed6299006d3f9, 96)
-#p0 = int2bytes(0xad4260e3cdc76bcc10c7b2c06b80b3be, 128)
-#p1 = int2bytes(0x948258e5ef20c508a81f51e96a518388, 128)
+iv = int2bytes(0xA68128B4243EB70FB0B25B05, 96)
+k = int2bytes(0x76BB24496A01683F0396BC0C77485FE839F4B084420E6AB9ABF29597A75E2934, 256)
+#a0 = int2bytes(0x2B07953A558C67B1E52DD4D13E29EDA5, 128)
+#a1 = int2bytes(0x59977BDF92100B048927A0A293187F47, 128)
+p0 = int2bytes(0x9D50C04B4072A17C795E95BED617430A, 128)
+p1 = int2bytes(0xC9272543D799D548D898B52B7FE3BD1D, 128)
+p2 = int2bytes(0xC0D104D5A4E168BE96F12E5E378D394E, 128)
+p3 = int2bytes(0xE4CC5ED7DD597EE8AE48B5EC2CF76896, 128)
 #ad = int2bytes(0x22ed235946235a85a45bc5fad7140bfa, 128)
-#ct, tt = gcm([ad], [p0, p1], k, iv)
+ct, tt = encrypt([], [p0, p1, p2, p3], k, iv)
 #
 #print(bytes2hex(gg))
 #print(bytes2hex(tt))
