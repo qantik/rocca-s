@@ -9,9 +9,27 @@ typedef uint16_t u16;
 typedef uint32_t u32;
 typedef uint64_t u64;
 
-void printb(u8 *x, size_t n) {
+void randbytes(u8 *x, size_t n) {
+    for (size_t i = 0; i < n; i++) {
+        x[i] = rand() % 256;
+    }
+}
+
+void printb8(const u8 *x, size_t n) {
     for (size_t i = 0; i < n; i++) {
         printf("%02X", x[i]);
+    }
+    printf("\n");
+}
+void printb16(const u16 *x, size_t n) {
+    for (size_t i = 0; i < n; i++) {
+        printf("%04X", x[i]);
+    }
+    printf("\n");
+}
+void printb32(const u32 *x, size_t n) {
+    for (size_t i = 0; i < n; i++) {
+        printf("%08X", x[i]);
     }
     printf("\n");
 }
@@ -44,7 +62,10 @@ void ghash_update(const u8 * H, u8 * A, const u8 * data, long long length) {
     u8 tmp[16];
     for( ; length >= 16; length -=16, data += 16) {
         XOR3x64(tmp, data, A);
+        //printb8(tmp, 16);
+        //printb8(H, 16);
         ghash_mult(A, tmp, H);
+        //printb8(A, 16);
     }
     if(!length) return;
     memset(tmp, 0, 16);
@@ -194,7 +215,14 @@ result[j] = roundKey[j] ^ w ^ t ^ ROTL32(t, 8)
         }
         for (int i = 0; i < 4; i++)
             R1[i] = R2[i] = R3[i] = 0x00000000;
+
         for (int i = 0; i < 16; i++) {
+            //printf("%d\n", i);
+            //printb32(R1, 4);
+            //printb32(R2, 4);
+            //printb32(R3, 4);
+            //printb16(A, 16);
+            //printb16(B, 16);
             u8 z[16];
             keystream(z);
             for (int j = 0; j < 8; j++)
@@ -219,14 +247,18 @@ void snowv_gcm_encrypt(u8 * A, u8 * ciphertext, u8 * plaintext, u64 plaintext_sz
     memset(A, 0, 16);
     snowv.keyiv_setup(key32, iv16, 1);
     snowv.keystream(Hkey);
+    //printb8(Hkey, 16);
     snowv.keystream(endPad);
+    //printb8(endPad, 16);
     ghash_update(Hkey, A, aad, aad_sz);
     for (u64 i = 0; i < plaintext_sz; i += 16) {
         u8 key_stream[16];
         snowv.keystream(key_stream);
+        //printb8(key_stream, 16);
         for(u8 j = 0; j < min(16, plaintext_sz - i); j++)
             ciphertext[i + j] = key_stream[j] ^ plaintext[i + j];
     }
+    //printb8(A, 16);
     ghash_update(Hkey, A, ciphertext, plaintext_sz);
     ghash_final(Hkey, A, aad_sz, plaintext_sz, endPad);
 }
@@ -234,20 +266,70 @@ void snowv_gcm_encrypt(u8 * A, u8 * ciphertext, u8 * plaintext, u64 plaintext_sz
 int main(void) {
     //u8 A[16]   = { 0x00 };
     //u8 C[16]   = { 0x00 };
-    //u8 P[16]   = { 0x00 };
-    //u8 AAD[16] = { 0x00 };
-    //u8 K[32]   = { 0x00 };
-    //u8 I[16]   = { 0x00 };
+    //u8 AAD[16] = { 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
+    //               0x38, 0x39, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66 };
+    //u8 P[16] = { 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
+    //             0x38, 0x39, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66 };
+    //u8 I[16] = { 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
+    //             0x38, 0x39, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66 };
+    //u8 K[32] = { 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
+    //             0x38, 0x39, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66,
+    //             0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
+    //             0x38, 0x39, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66 };
 
-    //snowv_gcm_encrypt(A, C, P, 0, AAD, 0, K, I);
-    //printb(A, 16);
+    //snowv_gcm_encrypt(A, C, P, 16, AAD, 16, K, I);
 
-    u8 X[16] = { 0x00 }; X[15] = 0xA2;
-    u8 Y[16] = { 0x00 }; Y[0]  = 0x40; Y[15] = 0x01;
-    u8 Z[16] = { 0x00 };
+    const int batchmax = 2;
+    const int admax  = 8;
+    const int msgmax = 8;
 
-    ghash_mult(Z, X, Y);
-    printb(Z, 16);
+    srand(0);
+
+    u8 iv[16];
+    u8 key[32];
+    u8 ad[16*admax];
+    u8 msg[16*msgmax];
+    u8 ct[16*msgmax];
+    u8 tag[16];
+
+    int index = 0;
+    int r = 2;
+
+    for (int adlen = 0; adlen < admax; adlen++) {
+        for (int msglen = 0; msglen < msgmax; msglen++) {
+            if (adlen % r != 0 || msglen % r != 0)
+                continue;
+
+            for (int i = 0; i < batchmax; i++) {
+                randbytes(iv, 16);
+                randbytes(key, 32);
+                
+                randbytes(ad, 16*adlen);
+                randbytes(msg, 16*msglen);
+
+                snowv_gcm_encrypt(tag, ct, msg, msglen*16, ad, adlen*16, key, iv);
+
+                printf("%d %d %d\n", index, adlen, msglen);
+                printb8(iv, 16);
+                printb8(key, 32);
+                for (int j = 0; j < adlen; j++)  printb8(ad+(16*j), 16);
+                for (int j = 0; j < msglen; j++) printb8(msg+(16*j), 16);
+                for (int j = 0; j < msglen; j++) printb8(ct+(16*j), 16);
+                printb8(tag, 16);
+
+                index++;
+            }
+        }
+    }
+    //printb8(C, 16);
+    //printb8(A, 16);
+
+    //u8 X[16] = { 0x00 }; X[15] = 0xA2;
+    //u8 Y[16] = { 0x00 }; Y[0]  = 0x40; Y[15] = 0x01;
+    //u8 Z[16] = { 0x00 };
+
+    //ghash_mult(Z, X, Y);
+    //printb(Z, 16);
     
     return 0;
 }

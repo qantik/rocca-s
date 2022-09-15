@@ -17,7 +17,7 @@ entity fa is
 end;
 
 
-architecture ballif of fa is
+architecture parallel of fa is
     signal a1, a2: std_logic_vector(255 downto 0);
     signal tmp1, tmp2, tmp3 : std_logic_vector(127 downto 0);
     signal T1_inv, T1 : std_logic_vector(127 downto 0);
@@ -42,5 +42,5 @@ begin
     
     z <= tmp2;
 		
-end architecture ballif;
+end architecture;
 

@@ -40,7 +40,7 @@ architecture tb of testbench is
     file testinput, testoutput, correct_v : TEXT;   
      
     constant STREAM_SIZE_IN_BLOCKS : integer := 10;
-    constant R : integer := 2;
+    constant R : integer := 1;
     
     type keystream is array (R downto 1) of std_logic_vector(127 downto 0);
     
