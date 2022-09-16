@@ -16,7 +16,7 @@ entity word_adder is
 end;
 
 
-architecture ballif of word_adder is
+architecture structural of word_adder is
 
     signal x1, x2, x3, x4 : std_logic_vector(31 downto 0);
     signal y1, y2, y3, y4 : std_logic_vector(31 downto 0);
@@ -56,5 +56,5 @@ begin
     Z(95 downto 64) <=  (z3);
     Z(127 downto 96) <= (z4);
 		
-end architecture ballif;
+end architecture;
 

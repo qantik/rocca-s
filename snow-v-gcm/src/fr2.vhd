@@ -16,11 +16,10 @@ entity fr2 is
       );
 end;
 
-
-architecture ballif of fr2 is
+architecture parallel of fr2 is
 begin
 
     aesrf0: entity aes generic map (rf_conf, sb_conf, mc_conf) port map (R1, R2n);
     
-end architecture ballif;
+end architecture;
 

@@ -3,7 +3,6 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use work.all;
 
-
 entity fb is
   port(
         A : in std_logic_vector(255 downto 0);
@@ -12,11 +11,10 @@ entity fb is
       );
 end;
 
-
-architecture ballif of fb is
+architecture parallel of fb is
 begin
 
     lfsr_b0 : entity lfsr_b port map(A, B, Bn);
     		
-end architecture ballif;
+end architecture;
 

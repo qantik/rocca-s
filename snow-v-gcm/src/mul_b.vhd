@@ -14,10 +14,9 @@ entity mul_b is
       );
 end;
 
--- Fatih says:
 -- 1 out of 8 cycle of LFSR
 
-architecture ballif of mul_b is
+architecture parallel of mul_b is
 
     signal tmp1, tmp2 : std_logic_vector(15 downto 0);
     signal term1, term2 : std_logic_vector(15 downto 0);
@@ -33,5 +32,5 @@ begin
     
     B15 <= term1 xor term2 xor B3 xor A0;
 		
-end architecture ballif;
+end architecture;
 

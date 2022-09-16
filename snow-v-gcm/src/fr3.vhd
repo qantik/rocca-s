@@ -16,11 +16,10 @@ entity fr3 is
       );
 end;
 
-
-architecture ballif of fr3 is
+architecture structural of fr3 is
 begin
 
     aesrf0: entity aes generic map (rf_conf, sb_conf, mc_conf) port map (R2, R3n);
     
-end architecture ballif;
+end architecture;
 

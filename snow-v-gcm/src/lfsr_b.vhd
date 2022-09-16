@@ -3,7 +3,6 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use work.all;
 
-
 entity lfsr_b is
   port(
         A : in std_logic_vector(255 downto 0);
@@ -12,7 +11,7 @@ entity lfsr_b is
       );
 end;
 
-architecture ballif of lfsr_b is
+architecture structural of lfsr_b is
     signal tmp: std_logic_vector(127 downto 0);
 begin
 
@@ -29,5 +28,5 @@ begin
 
     Bn(127 downto 0) <= tmp;
 
-end architecture ballif;
+end architecture;
 

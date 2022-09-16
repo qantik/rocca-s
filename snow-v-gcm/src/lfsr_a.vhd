@@ -12,7 +12,7 @@ entity lfsr_a is
       );
 end;
 
-architecture ballif of lfsr_a is
+architecture structural of lfsr_a is
     signal tmp : std_logic_vector(127 downto 0);
 begin
 
@@ -28,5 +28,5 @@ begin
     end generate;
     An(255 downto 128) <= tmp;
 
-end architecture ballif;
+end architecture;
 

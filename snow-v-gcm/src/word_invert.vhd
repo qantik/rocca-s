@@ -5,7 +5,6 @@ use ieee.numeric_std.all;
 use std.textio.all;
 use work.all;
 
-
 entity word_invert is 
 generic (SIZE : integer);
 port (
@@ -14,9 +13,7 @@ port (
     );
 end;
 
-
-
-architecture ballif of word_invert is
+architecture parallel of word_invert is
 begin 
 
     byte_sequence_inversion: for i in 0 to (SIZE-1) generate
@@ -24,6 +21,6 @@ begin
         OupxDO(16*i+7 downto 16*i) <= InpxDI(16*i+15 downto 16*i+8);
     end generate;    
 
-end;
+end architecture;
 
 

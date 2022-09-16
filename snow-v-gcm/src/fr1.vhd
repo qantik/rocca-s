@@ -19,8 +19,7 @@ entity fr1 is
       );
 end;
 
-
-architecture ballif of fr1 is
+architecture structural of fr1 is
     signal tmp1, tmp2, tmp3 : std_logic_vector(127 downto 0);
 begin
 
@@ -39,5 +38,5 @@ begin
         end if;        
     end process;
     
-end architecture ballif;
+end architecture;
 
