@@ -7,7 +7,8 @@ use work.all;
 use work.aes256_gcm_pkg.all;
 
 entity aes is
-    generic (sb_conf : sb_t_enum := sb_bonus_e;
+    generic (rf_conf : rf_t_enum := rf_ttable_e;
+             sb_conf : sb_t_enum := sb_bonus_e;
 	         mc_conf : mc_t_enum := mc_small_e);
     port (clk     : in std_logic;
           reset_n : in std_logic;
@@ -32,8 +33,7 @@ architecture structural of aes is
     signal roundkey : std_logic_vector(127 downto 0);
 
     signal run  : std_logic;
-
-    --signal cycle : unsigned(3 downto 0);
+    signal inter    : std_logic_vector(127 downto 0);
 
 begin
 
@@ -65,7 +65,7 @@ begin
     roundkey <= key_out(127 downto 0);
 
     state_in <= key(255 downto 128) xor pt when start = '1' else
-                shiftrows_out xor roundkey when cycle = 14  else rf_out;
+                inter xor roundkey when cycle = 14  else rf_out;
     key_in   <= key when start = '1' else ks_out;
 
     state_reg : entity reg generic map (128) port map (clk, reset_n, state_in, state_out);
@@ -73,15 +73,19 @@ begin
 
     ks  : entity keysched generic map (sb_conf) port map (cycle, key_out, ks_out);
 
-    subbytes_gen    : entity subbytes   generic map (sb_conf) port map (state_out, sbox_out);
-    shiftrows_gen   : entity shiftrows  port map (sbox_out, shiftrows_out);
-    mixcolumns_gen  : entity mixcolumns generic map (mc_conf)  port map (shiftrows_out, mixcolumns_out);
-    addroundkey_gen : entity addroundkey port map (mixcolumns_out, roundkey, rf_out);
+    rf_split_gen : if rf_conf = rf_split_e generate
+        subbytes_gen    : entity subbytes   generic map (sb_conf) port map (state_out, sbox_out);
+        shiftrows_gen   : entity shiftrows  port map (sbox_out, shiftrows_out);
+        mixcolumns_gen  : entity mixcolumns generic map (mc_conf) port map (shiftrows_out, mixcolumns_out);
+        addroundkey_gen : entity addroundkey port map (mixcolumns_out, roundkey, rf_out);
 
-    --rf_ttable_gen : if rf_conf = rf_ttable_e generate
-    --    mixttable_gen   : entity mixttable   port map (state_out, mixttable_out);
-    --    addroundkey_gen : entity addroundkey port map (mixttable_out, key_out, rf_out);
-    --end generate;
+        inter <= shiftrows_out;
+    end generate;
+
+    rf_ttable_gen : if rf_conf = rf_ttable_e generate
+        mixttable_gen   : entity mixttable   port map (state_out, mixttable_out, inter);
+        addroundkey_gen : entity addroundkey port map (mixttable_out, key_out, rf_out);
+    end generate;
 
 end architecture;
 

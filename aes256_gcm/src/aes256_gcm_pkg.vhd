@@ -4,7 +4,7 @@ use ieee.std_logic_1164.all;
 package aes256_gcm_pkg is
 
     -- unrolling factor
-    constant r : integer := 2;
+    constant r : integer := 1;
 
     -- Convenience array representing the seven 128-bit Rocca-S states.
     type state_t_arr is array (0 to 5) of std_logic_vector(127 downto 0);

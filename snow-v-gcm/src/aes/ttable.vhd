@@ -1,4 +1,3 @@
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;               -- contains conversion functions
@@ -309,4 +308,3 @@ OupxDO <= T0(to_integer(unsigned(A0xD(7 downto 0)))) xor T1(to_integer(unsigned(
 
  
 end architecture tt ;
-

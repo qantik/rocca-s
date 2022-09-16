@@ -15,7 +15,7 @@ end;
 
 
 
-architecture ballif of byte_invert is
+architecture parallel of byte_invert is
 begin 
 
     byte_sequence_inversion: for i in 0 to 15 generate

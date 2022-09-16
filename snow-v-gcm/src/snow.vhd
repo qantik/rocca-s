@@ -7,6 +7,10 @@ use work.all;
 use work.snow_gcm_pkg.all;
 
 entity snow is
+  generic (rf_conf    : rf_t_enum;
+           sb_conf    : sb_t_enum;
+	       mc_conf    : mc_t_enum;
+	       adder_conf : adder_t_enum);
   port(
         CLK : in std_logic;
         cycle : in unsigned(4 downto 0);
@@ -56,11 +60,11 @@ begin
     reg_R3: entity reg generic map(SIZE => 128) port map (CLK, run, R3n, R3(0));
     
     comb_block: for i in 0 to R-1  generate
-      fa0 : entity fa port map(A(i), B(i), R1(i), R2(i), init(i+1), A(i+1), ZZ(i+1));
+      fa0 : entity fa generic map (adder_conf) port map(A(i), B(i), R1(i), R2(i), init(i+1), A(i+1), ZZ(i+1));
       fb0 : entity fb port map(A(i), B(i), B(i+1));
-      fr1_0 : entity fr1 port map (A(i), K, R2(i), R3(i), addKeyLeft(i+1), addKeyRight(i+1), R1(i+1));
-      fr2_0 : entity fr2 port map (R1(i), R2(i+1));
-      fr3_0 : entity fr3 port map (R2(i), R3(i+1));
+      fr1_0 : entity fr1 generic map (adder_conf) port map (A(i), K, R2(i), R3(i), addKeyLeft(i+1), addKeyRight(i+1), R1(i+1));
+      fr2_0 : entity fr2 generic map (rf_conf, sb_conf, mc_conf) port map (R1(i), R2(i+1));
+      fr3_0 : entity fr3 generic map (rf_conf, sb_conf, mc_conf) port map (R2(i), R3(i+1));
     end generate;
     
     dis : entity dispatch port map (CLK, cycle, addKeyLeft, addKeyRight, init, load);

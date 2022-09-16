@@ -1,29 +1,45 @@
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
-use ieee.numeric_std.all;
-use std.textio.all;
+
+library work;
 use work.all;
-
-
+use work.snow_gcm_pkg.all;
 
 entity mixcolumns is 
-port (
-	InpxDI : in std_logic_vector (127 downto 0);
-    OupxDO : out std_logic_vector (127 downto 0)
-    );
-end entity mixcolumns;
+    generic (mc_conf : mc_t_enum);
+    port (x : in std_logic_vector(127 downto 0);
+          y : out std_logic_vector(127 downto 0));
+end entity;
 
+architecture structural of mixcolumns is
+begin
+    
+    mc_simple_gen : if mc_conf = mc_simple_e generate
+        mc_simple_cols_gen : for i in 0 to 3 generate
+            mc : entity mc_simple port map (
+                x((i+1)*32 - 1 downto i*32), 
+                y((i+1)*32 - 1 downto i*32)
+            ); 
+        end generate;
+    end generate;
 
-
-architecture dui of mixcolumns is
-begin 
-
-	msc0: entity mix_single_column (banik) port map (InpxDI(31 downto 0), OupxDO(31 downto 0));
-	msc1: entity mix_single_column (banik) port map (InpxDI(63 downto 32), OupxDO(63 downto 32));
-	msc2: entity mix_single_column (banik) port map (InpxDI(95 downto 64), OupxDO(95 downto 64));
-	msc3: entity mix_single_column (banik) port map (InpxDI(127 downto 96), OupxDO(127 downto 96));
-
-end architecture dui;
-
+    mc_small_gen : if mc_conf = mc_small_e generate
+        mc_small_cols_gen : for i in 0 to 3 generate
+            mc : entity mc_small port map (
+                x((i+1)*32 - 1 downto i*32), 
+                y((i+1)*32 - 1 downto i*32)
+            ); 
+        end generate;
+    end generate;
+    
+    mc_fast_gen : if mc_conf = mc_fast_e generate
+        mc_fast_cols_gen : for i in 0 to 3 generate
+            mc : entity mc_fast port map (
+                x((i+1)*32 - 1 downto i*32), 
+                y((i+1)*32 - 1 downto i*32)
+            ); 
+        end generate;
+    end generate;
+    
+end architecture;
 

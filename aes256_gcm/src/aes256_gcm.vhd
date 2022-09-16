@@ -106,7 +106,7 @@ begin
     tg_reg : entity dff port map (clk, tg_load, tg_in, tg_out);
    
     core_gen : for i in 0 to r-1 generate
-        aes_gen : entity aes generic map (sb_conf, mc_conf) port map (
+        aes_gen : entity aes generic map (rf_conf, sb_conf, mc_conf) port map (
             clk, reset_n, aes_start, key, aes_pt(i), aes_ct(i), cycle
         );
         gf_gen : entity gf128_mult port map (mult_in0(i), mult_in1, mult_out(i)); 

@@ -3,12 +3,11 @@ use ieee.std_logic_1164.all;
 
 library work;
 use work.all;
-use work.aes256_gcm_pkg.all;
+use work.snow_gcm_pkg.all;
 
 entity mixttable is 
     port (x : in std_logic_vector(127 downto 0);
-          y : out std_logic_vector(127 downto 0);
-          inter : out std_logic_vector(127 downto 0));
+          y : out std_logic_vector(127 downto 0));
 end entity;
 
 architecture structural of mixttable is
@@ -22,8 +21,7 @@ begin
     ttable_gen : for i in 0 to 3 generate
         ttable : entity work.ttable port map (
             shiftrows_out((i+1)*32 - 1 downto i*32), 
-            y((i+1)*32 - 1 downto i*32),
-            inter((i+1)*32 - 1 downto i*32)
+            y((i+1)*32 - 1 downto i*32)
         ); 
     end generate;
 

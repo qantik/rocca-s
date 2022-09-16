@@ -1,18 +1,18 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
 use work.all;
 
-
-entity block_adder is
+entity brentkung is
   port(
         a: in std_logic_vector(31 downto 0);
         b: in std_logic_vector(31 downto 0);
         s: out std_logic_vector(31 downto 0)
       );
-end;
+end entity;
 
-architecture brentkung of block_adder is
+architecture parallel of brentkung is
 
     signal g,p      :  std_logic_vector(31 downto 0);
     signal l1g,l1p  :  std_logic_vector(15 downto 0);
@@ -162,12 +162,6 @@ s(30)<= p(30) xor G29;
 G30  <= g(30) or (G29 and p(30));--G29 or (g(30) and P29);8
 s(31)<= p(31) xor G30;
 
-
-
-end architecture brentkung;
-
-
-
-
+end architecture;
 
 

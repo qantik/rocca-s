@@ -1,8 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
 use ieee.numeric_std.all;
-use std.textio.all;
 use work.all;
  
 
@@ -11,7 +9,7 @@ port ( InpxDI : in  std_logic_vector(7 downto 0);
        PinxD : out std_logic_vector(255 downto 0));
 end entity decoder;
 
-architecture ballif of decoder is 
+architecture parallel of decoder is 
 
 	signal C1xD,C2xD,D1xD,D2xD: std_logic_vector(3 downto 0);
 	signal P1xD,P2xD: std_logic_vector (15 downto 0);
@@ -96,7 +94,7 @@ end generate i_loop;
 
 
 
-end architecture ballif;
+end architecture;
 
 
 

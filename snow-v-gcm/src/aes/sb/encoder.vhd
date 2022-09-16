@@ -1,18 +1,16 @@
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
 use ieee.numeric_std.all;
-use std.textio.all;
 use work.all;
  
 
-entity enc is
+entity encoder is
 port ( InpxDI : in  std_logic_vector(255 downto 0); 
  
        OupxDO : out std_logic_vector(7 downto 0));
-end entity enc;
+end entity encoder;
 
-architecture en of enc is 
+architecture structural of encoder is 
 
 signal PoutxD : std_logic_vector (255 downto 0);
 
@@ -181,7 +179,7 @@ LJIHGF6xD <= LIHGF5xD and JIHGF5xD(2);
 OupxDO(7)<= LJIHGF6xD nand KJIHGF6xD(1);
 
 
-end architecture en;
+end architecture;
 
 
 

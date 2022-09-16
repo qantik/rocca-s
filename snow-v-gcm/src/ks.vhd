@@ -1,23 +1,20 @@
-   
-library work;
-use work.all;
-	
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;	
+   
+library work;
+use work.all;
 
-
-entity adder is
+entity kogstone is
 port(
         A    : in  std_logic_vector(31 downto 0);
         B    : in  std_logic_vector(31 downto 0);
         S     : out std_logic_vector(31 downto 0) 
  
     );
+end entity;
 
-end adder;
-
-architecture kogstone of adder is
+architecture parallel of kogstone is
  
 signal P0,P1,P2,P3,P4,G0,G1,G2,G3,G4,G5: std_logic_vector(31 downto 0);
 
@@ -90,4 +87,4 @@ end generate sum;
  
 
 
-end architecture kogstone;
+end architecture;

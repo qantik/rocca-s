@@ -4,7 +4,7 @@ use ieee.std_logic_1164.all;
 package snow_gcm_pkg is
 
     -- unrolling factor
-    constant r : integer := 2;
+    constant r : integer := 1;
 
     -- Convenience array representing the seven 128-bit Rocca-S states.
     type state_t_arr is array (0 to 5) of std_logic_vector(127 downto 0);
@@ -26,6 +26,8 @@ package snow_gcm_pkg is
     --  2. Li et al.'s depth-3 circuit [TCHES'2019].
     --  3. Maximov's world record smallest circuit [IACR-EPRINT].
     type mc_t_enum is (mc_simple_e, mc_fast_e, mc_small_e);
+    
+    type adder_t_enum is (adder_ks_e, adder_bk_e);
     
     type state_type is (idle_state, load_state, ad_state, msg_state, tag_state);
 
