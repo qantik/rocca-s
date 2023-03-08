@@ -303,9 +303,9 @@ A3xD <= InpxDI(7 downto 0);
 
 OupxDO <= T0(to_integer(unsigned(A0xD(7 downto 0)))) xor T1(to_integer(unsigned(A1xD(7 downto 0)))) xor T2(to_integer(unsigned(A2xD(7 downto 0)))) xor T3(to_integer(unsigned(A3xD(7 downto 0))));
 
-inter <= (T0(to_integer(unsigned(A0xD(7 downto 0)))) and X"00FF0000") xor
-         (T1(to_integer(unsigned(A1xD(7 downto 0)))) and X"0000FF00") xor
-         (T2(to_integer(unsigned(A2xD(7 downto 0)))) and X"000000FF") xor
-         (T3(to_integer(unsigned(A3xD(7 downto 0)))) and X"FF000000");
+inter <= (T0(to_integer(unsigned(A1xD(7 downto 0)))) and X"00FF0000") xor
+         (T1(to_integer(unsigned(A2xD(7 downto 0)))) and X"0000FF00") xor
+         (T2(to_integer(unsigned(A3xD(7 downto 0)))) and X"000000FF") xor
+         (T3(to_integer(unsigned(A0xD(7 downto 0)))) and X"FF000000");
 
 end architecture tt ;

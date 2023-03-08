@@ -8,8 +8,8 @@ use work.rocca_round_s_pkg.all;
 
 entity rocca_round_s is
     generic (rf_conf : rf_t_enum := rf_split_e;
-	     sb_conf : sb_t_enum := sb_bonus_e;
-	     mc_conf : mc_t_enum := mc_small_e);
+	     sb_conf : sb_t_enum := sb_tradeoff_e;
+	     mc_conf : mc_t_enum := mc_fast_e);
     port (clk   : in std_logic;
           reset : in std_logic;
 
@@ -59,15 +59,29 @@ begin
     k1     <= key(127 downto 0);
     length <= ad_len & msg_len;
 
-    sr_in(0) <= k1               when sr_load_en = '1' else ru_out(0);
+--    sr_in(0) <= k1               when sr_load_en = '1' else ru_out(0);
+--    sr_in(1) <= nonce            when sr_load_en = '1' else
+--		ru_out(1) xor k0 when sr12_sel   = '1' else ru_out(1); 
+--    sr_in(2) <= z0               when sr_load_en = '1' else
+--		ru_out(2) xor k1 when sr12_sel   = '1' else ru_out(2); 
+--    sr_in(3) <= k0               when sr_load_en = '1' else ru_out(3);
+--    sr_in(4) <= z1               when sr_load_en = '1' else ru_out(4);
+--    sr_in(5) <= nonce xor k1     when sr_load_en = '1' else
+--		ru_out(5) xor k0 when sr56_sel   = '1' else ru_out(5); 
+--    sr_in(6) <= (others => '0')  when sr_load_en = '1' else
+--		ru_out(6) xor k1 when sr56_sel   = '1' else ru_out(6); 
+    sr_in(0) <= k1               when sr_load_en = '1' else
+		ru_out(0) xor k0 when sr56_sel   = '1' else ru_out(0);
     sr_in(1) <= nonce            when sr_load_en = '1' else
-		ru_out(1) xor k0 when sr12_sel   = '1' else ru_out(1); 
+		ru_out(1) xor k0 when (sr12_sel xor sr56_sel) = '1' else ru_out(1); 
     sr_in(2) <= z0               when sr_load_en = '1' else
-		ru_out(2) xor k1 when sr12_sel   = '1' else ru_out(2); 
-    sr_in(3) <= k0               when sr_load_en = '1' else ru_out(3);
-    sr_in(4) <= z1               when sr_load_en = '1' else ru_out(4);
+		ru_out(2) xor k1 when (sr12_sel xor sr56_sel) = '1' else ru_out(2); 
+    sr_in(3) <= k0               when sr_load_en = '1' else
+		ru_out(3) xor k0 when sr56_sel   = '1' else ru_out(3);
+    sr_in(4) <= z1               when sr_load_en = '1' else
+		ru_out(4) xor k0 when sr56_sel   = '1' else ru_out(4);
     sr_in(5) <= nonce xor k1     when sr_load_en = '1' else
-		ru_out(5) xor k0 when sr56_sel   = '1' else ru_out(5); 
+		ru_out(5) xor k1 when sr56_sel   = '1' else ru_out(5); 
     sr_in(6) <= (others => '0')  when sr_load_en = '1' else
 		ru_out(6) xor k1 when sr56_sel   = '1' else ru_out(6); 
 
@@ -86,10 +100,17 @@ begin
         sr_out, ru_out, epoch, ru_aux_in(255 downto 128), ru_aux_in(127 downto 0)
     );
 
+    --
+    -- control signals
+    --
     cont : entity controller port map (
         clk, reset, last_block, ad_empty, msg_empty, epoch, sr_load_en, sr12_sel, sr56_sel, ru_aux_sel
     );
 
+    --
+    -- tag generation function
+    --
+    --tg : entity taggen port map (sr_out, tag);
     f0_gen : entity f0 generic map (rf_conf, sb_conf, mc_conf) port map(sr_out, data, ct);
     tg     : entity taggen port map (sr_out, tag);
 

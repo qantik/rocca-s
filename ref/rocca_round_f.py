@@ -25,24 +25,20 @@ def roundupdate(s, x0, x1):
     s4 = aesround(s[3], x1)
     s5 = aesround(s[4], s[3])
     s6 = aesround(s[5], s[4])
-    # print()
     s[0], s[1], s[2], s[3], s[4], s[5], s[6] = s0, s1, s2, s3, s4, s5, s6 
     
 def initialization(n, k0, k1):
     s = [ k1[:], n[:], _z0[:], k0[:], _z1[:], _xor(n, k1), [0x00]*16 ]
     
     for _ in range(16):
-        # print(bytes2hex(s[0]))
-        # print(bytes2hex(s[1]))
-        # print(bytes2hex(s[2]))
-        # print(bytes2hex(s[3]))
-        # print(bytes2hex(s[4]))
-        # print(bytes2hex(s[5]))
-        # print(bytes2hex(s[6]))
-        # print()
         roundupdate(s, _z0, _z1)
 
-    s[5] = _xor(s[5], k0)
+    s[0] = _xor(s[0], k0)
+    s[1] = _xor(s[1], k0)
+    s[2] = _xor(s[2], k1)
+    s[3] = _xor(s[3], k0)
+    s[4] = _xor(s[4], k0)
+    s[5] = _xor(s[5], k1)
     s[6] = _xor(s[6], k1)
     return s
 
@@ -85,23 +81,7 @@ def outputtag(s, k0, k1, adlen, msglen):
     s[1] = _xor(s[1], k0)
     s[2] = _xor(s[2], k1)
     for i in range(16):
-        # print(bytes2hex(s[0]))
-        # print(bytes2hex(s[1]))
-        # print(bytes2hex(s[2]))
-        # print(bytes2hex(s[3]))
-        # print(bytes2hex(s[4]))
-        # print(bytes2hex(s[5]))
-        # print(bytes2hex(s[6]))
-        # print()
         roundupdate(s, int2bytes(adlen, 128), int2bytes(msglen, 128))
-    # print(bytes2hex(s[0]))
-    # print(bytes2hex(s[1]))
-    # print(bytes2hex(s[2]))
-    # print(bytes2hex(s[3]))
-    # print(bytes2hex(s[4]))
-    # print(bytes2hex(s[5]))
-    # print(bytes2hex(s[6]))
-    # print()
     return _xor(s[0], _xor(s[1], _xor(s[2], s[3]))) + _xor(s[4], _xor(s[5], s[6]))
 
 def encrypt(n, ad, msg, k):
@@ -122,9 +102,11 @@ def encrypt(n, ad, msg, k):
     t = outputtag(s, k0, k1, adlen, msglen) 
     return ct, t
 
-# n   = int2bytes(0xC5D71484F8CF9BF4B76F47904730804B, 128)
+n   = int2bytes(0xda1f334a7017250d3f603dc82ebd3b12, 128)
 # ad  = int2bytes(0x000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F, 256)
-# msg = int2bytes(0xAF803CE25906F1D19FB6C6804E06EA28AB178F457AF6B493B7439EC6D4290062, 256)
-# k   = int2bytes(0x9E3225A9F133B5DEA168F4E2851F072FCC00FCAA7CA62061717A48E52E29A3FA, 256)
+msg = int2bytes(0xaf803ce25906f1d19fb6c6804e06ea28ab178f457af6b493b7439ec6d4290062, 256)
+k   = int2bytes(0x0b635e3ff56b1f0bd933852371249ab3df5c1fef1433c86685b7f056681d5152, 256)
 
-# ct, t = encrypt(n, [], [], k)
+ct, t = encrypt(n, [], [msg], k)
+#print(bytes2hex(ct[0]))
+#print(bytes2hex(t))

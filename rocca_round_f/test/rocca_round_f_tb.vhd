@@ -97,6 +97,7 @@ begin
                       constant v_msg_len   : in integer;
                       constant v_tag       : in std_logic_vector(255 downto 0)) is
 	    begin
+
 	        nonce <= v_nonce;
 	        key   <= v_key;
             data  <= (others => '0');
@@ -120,9 +121,11 @@ begin
             end loop;
 
             msg_loop : for i in 0 to v_msg_len-1 loop
-                wait for clk_period;
+                wait for clk_period/2;
                 data <= v_msg_array(i);
                 if i = v_msg_len-1 then last_block <= '1'; else last_block <= '0'; end if;
+                wait for clk_period/2;
+                assert vector_equal(ct, v_ct_array(i)) report "wrong ct" severity failure;
             end loop;
             
             wait for 17*clk_period;
@@ -131,10 +134,10 @@ begin
         end procedure run;
         
     begin
-        file_open(test_vectors, "../test/vectors.txt", read_mode);
+        file_open(test_vectors, "../test/vectors_new.txt", read_mode);
 
         while not endfile(test_vectors) loop
-        --for z in 1 to 20 loop
+        --for z in 0 to 5 loop
                 
 	    readline(test_vectors, vec_line);
             read(vec_line, vec_id); read(vec_line, vec_space);

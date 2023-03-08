@@ -7,7 +7,7 @@ use work.all;
 use work.aes256_gcm_pkg.all;
 
 entity aes256_gcm is
-    generic (rf_conf : rf_t_enum := rf_split_e;
+    generic (rf_conf : rf_t_enum := rf_ttable_e;
 	         sb_conf : sb_t_enum := sb_fast_e;
 	         mc_conf : mc_t_enum := mc_fast_e);
     port (clk     : in std_logic;

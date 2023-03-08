@@ -7,11 +7,11 @@ random.seed(0)
 def randbytes(size):
     return [ random.randint(0, 255) for _ in range(size) ]
 
-_batch_max = 2
-_ad_max    = 4
-_msg_max   = 4
+_batch_max = 3
+_ad_max    = 6
+_msg_max   = 6
 
-_r = 1
+_r = 2
 
 index = 0
 for ad_len in range(_ad_max):

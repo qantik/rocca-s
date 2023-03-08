@@ -107,44 +107,47 @@ begin
             if v_msg_len > 0 then msg_empty <= '0'; else msg_empty <= '1'; end if;
             last_block <= '0';
 
-	    reset <= '1';
+	        reset <= '1';
             wait for clk_period;
             reset <= '0';
 
             --wait for 32.5*clk_period; -- initialization
-            wait for 33*clk_period; -- initialization
+            wait for 32*clk_period; -- initialization
 
             ad_loop : for i in 0 to v_ad_len-1 loop
+                wait for 0.5*clk_period;
                 data <= v_ad_array(i);
                 if i = v_ad_len-1 then last_block <= '1'; end if;
-                wait for 2*clk_period;
+                wait for 1.5*clk_period;
             end loop;
 
             --data       <= (others => '0');
             --last_block <= '0';
             
             msg_loop : for i in 0 to v_msg_len-1 loop
+                wait for 0.5*clk_period;
                 data <= v_msg_array(i);
                 if i = v_msg_len-1 then last_block <= '1'; else last_block <= '0'; end if;
-                wait for 2*clk_period;
-                --assert vector_equal(ct, v_ct_array(i)) report "wrong ct" severity failure;
+                wait for 0.5*clk_period;
+                assert vector_equal(ct, v_ct_array(i)) report "wrong ct" severity failure;
+                wait for 1.0*clk_period;
             end loop;
             
             --data       <= (others => '0');
             --last_block <= '0';
 
             --wait for 32.5*clk_period;
-            wait for 32*clk_period;
+            wait for 33*clk_period;
                 
             assert vector_equal(tag, v_tag) report "wrong tag" severity failure;
 	    	
         end procedure run;
         
     begin
-        file_open(test_vectors, "../test/vectors_f0.txt", read_mode);
+        file_open(test_vectors, "../test/vectors_new.txt", read_mode);
 
-        --while not endfile(test_vectors) loop
-        for z in 1 to 20 loop
+        while not endfile(test_vectors) loop
+        --for z in 0 to 10 loop
                 
 	        readline(test_vectors, vec_line);
             read(vec_line, vec_id); read(vec_line, vec_space);

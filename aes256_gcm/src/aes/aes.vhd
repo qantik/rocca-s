@@ -84,7 +84,7 @@ begin
 
     rf_ttable_gen : if rf_conf = rf_ttable_e generate
         mixttable_gen   : entity mixttable   port map (state_out, mixttable_out, inter);
-        addroundkey_gen : entity addroundkey port map (mixttable_out, key_out, rf_out);
+        addroundkey_gen : entity addroundkey port map (mixttable_out, roundkey, rf_out);
     end generate;
 
 end architecture;
