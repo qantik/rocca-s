@@ -24,8 +24,6 @@ end entity;
 
 architecture test of rocca_unrolled_f_tb is
     
-    --constant r : integer := 2;
-
     -- Input signals.
     signal clk   : std_logic := '0';
     signal reset : std_logic;
@@ -92,6 +90,7 @@ begin
         variable vec_msg_array : data_array;
         variable vec_ct_array  : data_array;
         variable vec_tag       : std_logic_vector(255 downto 0);
+        variable tmp           : std_logic_vector(255 downto 0);
         
         file test_vectors : text;
         
@@ -104,17 +103,17 @@ begin
                       constant v_msg_len   : in integer;
                       constant v_tag       : in std_logic_vector(255 downto 0)) is
 	    begin
-	        nonce <= v_nonce;
-	        key   <= v_key;
+	    nonce <= v_nonce;
+	    key   <= v_key;
             data  <= (others => '0');
 
-            ad_len  <= std_logic_vector(to_unsigned(v_ad_len, ad_len'length));
-            msg_len <= std_logic_vector(to_unsigned(v_msg_len, msg_len'length));
+            ad_len  <= std_logic_vector(to_unsigned(v_ad_len*256, ad_len'length));
+            msg_len <= std_logic_vector(to_unsigned(v_msg_len*256, msg_len'length));
             if v_ad_len  > 0 then ad_empty  <= '0'; else ad_empty  <= '1'; end if;
             if v_msg_len > 0 then msg_empty <= '0'; else msg_empty <= '1'; end if;
             last_block <= '0';
 
-	        reset <= '1';
+            reset <= '1';
             wait for clk_period;
             reset <= '0';
 
@@ -123,41 +122,35 @@ begin
             ad_loop0 : for i in 0 to ((v_ad_len)/r)-1 loop
                 wait for clk_period;
                 ad_loop1: for j in 0 to r-1 loop
-                    --data(j) <= v_ad_array(i*r+j);
                     data((256*(j+1))-1 downto 256*j) <= v_ad_array(i*r+j);
                 end loop;
                 if i = ((v_ad_len)/r)-1 then last_block <= '1'; end if;
             end loop;
 
-            --data       <= (others => '0');
-            --last_block <= '0';
             
-            msg_loop0 : for i in 0 to ((v_msg_len)/r)-1 loop
-                wait for clk_period;
+	        msg_loop0 : for i in 0 to ((v_msg_len)/r)-1 loop
+                wait for clk_period/2;
                 msg_loop1: for j in 0 to r-1 loop
-                    --data(j) <= v_msg_array(i*r+j);
                     data((256*(j+1))-1 downto 256*j) <= v_msg_array(i*r+j);
                 end loop;
                 if i = ((v_msg_len)/r)-1 then last_block <= '1'; else last_block <= '0'; end if;
-                    --assert vector_equal(ct, v_ct_array(i)) report "wrong ct" severity failure;
+                wait for clk_period/2;
+                check_loop: for j in 0 to r-1 loop
+                    --assert vector_equal(ct((256*(j+1))-1 downto 256*j), v_ct_array(i*r+j)) report "wrong ct" severity failure;
+                end loop;
             end loop;
             
-            --data       <= (others => '0');
-            --last_block <= '0';
-
             wait for (16/r)*clk_period;
             wait for clk_period;
-            --wait for 0.25*clk_period;
                 
             assert vector_equal(tag, v_tag) report "wrong tag" severity failure;
 	    	
         end procedure run;
         
     begin
-        file_open(test_vectors, "../test/vectors_unrolled_4r_f0.txt", read_mode);
+        file_open(test_vectors, "../test/vectors.txt", read_mode);
 
         while not endfile(test_vectors) loop
-        --for z in 1 to 10 loop
                 
 	        readline(test_vectors, vec_line);
             read(vec_line, vec_id); read(vec_line, vec_space);

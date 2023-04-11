@@ -12,7 +12,6 @@ entity controller is
           msg_empty : std_logic;
 
           sr_load_en : out std_logic;
-          sr12_sel   : out std_logic;
           sr56_sel   : out std_logic;
           ru_aux_sel : out std_logic_vector(1 downto 0));
 end entity;
@@ -59,7 +58,6 @@ begin
         count_en    <= '0';
         
         sr_load_en <= '0';
-        sr12_sel   <= '0';
         sr56_sel   <= '0';
         ru_aux_sel <= "00";
 
@@ -85,7 +83,6 @@ begin
                         next_state <= msg_state;
                     else
                         next_state <= tag_state;
-                        sr12_sel   <= '1';
                     end if;
                 end if;
 
@@ -98,7 +95,6 @@ begin
                         next_state <= msg_state;
                     else
                         next_state <= tag_state;
-                        sr12_sel   <= '1';
                     end if;
                 end if;
             
@@ -108,7 +104,6 @@ begin
 
                 if last_block = '1' then
                     next_state <= tag_state;
-                    sr12_sel   <= '1';
                 end if;
 
 

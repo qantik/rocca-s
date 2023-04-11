@@ -29,12 +29,12 @@ begin
     x0 <= data(255 downto 128);
     x1 <= data(127 downto 0);
 
-    aes0_pt <= s(0) xor s(6);
-    aes0     : entity aes generic map (rf_conf, sb_conf, mc_conf) port map (aes0_pt, s(4), aes0_ct);
+    aes0_pt <= s(3) xor s(5);
+    aes0     : entity aes generic map (rf_conf, sb_conf, mc_conf) port map (aes0_pt, s(0), aes0_ct);
     ct(255 downto 128) <= aes0_ct xor x0;
     
-    aes1_pt <= s(2) xor s(3);
-    aes1     : entity aes generic map (rf_conf, sb_conf, mc_conf) port map (aes1_pt, s(5), aes1_ct);
+    aes1_pt <= s(4) xor s(6);
+    aes1     : entity aes generic map (rf_conf, sb_conf, mc_conf) port map (aes1_pt, s(2), aes1_ct);
     ct(127 downto 0) <= aes1_ct xor x1;
 
 end architecture;

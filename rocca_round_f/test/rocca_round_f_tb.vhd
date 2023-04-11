@@ -102,8 +102,8 @@ begin
 	        key   <= v_key;
             data  <= (others => '0');
 
-            ad_len  <= std_logic_vector(to_unsigned(v_ad_len, ad_len'length));
-            msg_len <= std_logic_vector(to_unsigned(v_msg_len, msg_len'length));
+            ad_len  <= std_logic_vector(to_unsigned(v_ad_len*256, ad_len'length));
+            msg_len <= std_logic_vector(to_unsigned(v_msg_len*256, msg_len'length));
             if v_ad_len  > 0 then ad_empty  <= '0'; else ad_empty  <= '1'; end if;
             if v_msg_len > 0 then msg_empty <= '0'; else msg_empty <= '1'; end if;
             last_block <= '0';
@@ -134,10 +134,9 @@ begin
         end procedure run;
         
     begin
-        file_open(test_vectors, "../test/vectors_new.txt", read_mode);
+        file_open(test_vectors, "../test/vectors.txt", read_mode);
 
         while not endfile(test_vectors) loop
-        --for z in 0 to 5 loop
                 
 	    readline(test_vectors, vec_line);
             read(vec_line, vec_id); read(vec_line, vec_space);

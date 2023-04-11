@@ -1,8 +1,8 @@
 import aes
 from utils import *
 
-_z0 = int2bytes(0x428A2F98D728AE227137449123EF65CD, 128)
-_z1 = int2bytes(0xB5C0FBCFEC4D3B2FE9B5DBA58189DBBC, 128)
+_z0 = int2bytes(0xCD65EF239144377122AE28D7982F8A42, 128)
+_z1 = int2bytes(0xBCDB8981A5DBB5E92F3B4DECCFFBC0B5, 128)
 
 def _xor(x, y):
     return [ x[i] ^ y[i] for i in range(16) ]
@@ -48,26 +48,10 @@ def absorbad(s, ad0, ad1, adlen):
 
 def absorbmsg(s, msg0, msg1, msglen, scheme=0):
     func0 = lambda i : (
-        _xor(aesround(_xor(s[0], s[6]), s[4]), msg0[i]),
-        _xor(aesround(_xor(s[2], s[3]), s[5]), msg1[i])
+        _xor(aesround(_xor(s[3], s[5]), s[0]), msg0[i]),
+        _xor(aesround(_xor(s[4], s[6]), s[2]), msg1[i])
     )
-    func1 = lambda i : (
-        _xor(_xor(aesround(s[6], s[4]), s[2]), msg0[i]),
-        _xor(aesround(_xor(s[2], s[3]), s[5]), msg1[i])
-    )
-    func2 = lambda i : (
-        _xor(_xor(_xor(_and(s[4], s[6]), s[1]), s[2]), msg0[i]),
-        _xor(_xor(_xor(_and(s[2], s[5]), s[0]), s[3]), msg1[i])
-    )
-    func3 = lambda i : (
-        _xor(_xor(_xor(_and(s[1], _xor(s[0], s[4])), s[2]), s[3]), msg0[i]),
-        _xor(_xor(_xor(_and(s[5], _xor(s[2], s[6])), s[0]), s[1]), msg1[i])
-    )
-    func4 = lambda i : (
-        _xor(_xor(_xor(_and(s[1], _xor(s[0], s[4])), s[2]), s[3]), msg0[i]),
-        _xor(_xor(_xor(_and(s[5], s[6]), s[0]), s[1]), msg1[i])
-    )
-    funcs = [ func0, func1, func2, func3, func4 ]
+    funcs = [ func0 ]
     func  = funcs[scheme]
 
     ct = []
@@ -78,10 +62,8 @@ def absorbmsg(s, msg0, msg1, msglen, scheme=0):
     return ct
 
 def outputtag(s, k0, k1, adlen, msglen):
-    s[1] = _xor(s[1], k0)
-    s[2] = _xor(s[2], k1)
     for i in range(16):
-        roundupdate(s, int2bytes(adlen, 128), int2bytes(msglen, 128))
+        roundupdate(s, int2bytes(adlen*256, 128), int2bytes(msglen*256, 128))
     return _xor(s[0], _xor(s[1], _xor(s[2], s[3]))) + _xor(s[4], _xor(s[5], s[6]))
 
 def encrypt(n, ad, msg, k):
@@ -102,11 +84,9 @@ def encrypt(n, ad, msg, k):
     t = outputtag(s, k0, k1, adlen, msglen) 
     return ct, t
 
-n   = int2bytes(0xda1f334a7017250d3f603dc82ebd3b12, 128)
+n     = int2bytes(0xAF803CE25906F1D19FB6C6804E06EA28, 128)
 # ad  = int2bytes(0x000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F, 256)
-msg = int2bytes(0xaf803ce25906f1d19fb6c6804e06ea28ab178f457af6b493b7439ec6d4290062, 256)
-k   = int2bytes(0x0b635e3ff56b1f0bd933852371249ab3df5c1fef1433c86685b7f056681d5152, 256)
-
-ct, t = encrypt(n, [], [msg], k)
-#print(bytes2hex(ct[0]))
-#print(bytes2hex(t))
+msg0  = int2bytes(0xE4F90013FDA69FEF19D4602A4207CDD5A1016D070132613C659A8F5D33F3CB29, 256)
+msg1  = int2bytes(0x0B8CE73B8344B13A4F8E0915146984A1BB15FDEADEBE5B6AC09504464D8AAAAC, 256)
+k     = int2bytes(0xAB178F457AF6B493B7439EC6D4290062AB517A72E5C1D410CDD61754E4208450, 256)
+ct, t = encrypt(n, [], [msg0, msg1], k)

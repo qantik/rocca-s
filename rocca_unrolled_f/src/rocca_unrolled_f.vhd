@@ -8,7 +8,7 @@ use work.rocca_unrolled_f_pkg.all;
 
 entity rocca_unrolled_f is
     generic (rf_conf : rf_t_enum := rf_split_e;
-	     sb_conf : sb_t_enum := sb_fast_e;
+	     sb_conf : sb_t_enum := sb_tradeoff_e;
 	     mc_conf : mc_t_enum := mc_fast_e);
     port (clk   : in std_logic;
           reset : in std_logic;
@@ -42,13 +42,13 @@ architecture structural of rocca_unrolled_f is
     signal ru_aux_in  : std_logic_vector(255 downto 0);
     signal ru_aux_out : std_logic_vector(255 downto 0); 
     
-    signal sr_load_en, sr12_sel, sr56_sel : std_logic;
-    signal ru_aux_sel                     : std_logic_vector(1 downto 0);
+    signal sr_load_en, sr56_sel : std_logic;
+    signal ru_aux_sel           : std_logic_vector(1 downto 0);
 
     signal length : std_logic_vector(255 downto 0);
     
-    constant z0 : std_logic_vector(127 downto 0)  := X"428A2F98D728AE227137449123EF65CD";
-    constant z1 : std_logic_vector(127 downto 0)  := X"B5C0FBCFEC4D3B2FE9B5DBA58189DBBC";
+    constant z0 : std_logic_vector(127 downto 0)  := X"CD65EF239144377122AE28D7982F8A42";
+    constant z1 : std_logic_vector(127 downto 0)  := X"BCDB8981A5DBB5E92F3B4DECCFFBC0B5";
     constant z  : std_logic_vector (255 downto 0) := z0 & z1;
 
     type   ru_inter_t_arr is array (0 to r) of state_t_arr;
@@ -66,15 +66,18 @@ begin
         ct(256*(i+1)-1 downto 256*i) <= cti(i);
     end generate;
 
-    sr_in(0) <= k1               when sr_load_en = '1' else ru_out(0);
+    sr_in(0) <= k1               when sr_load_en = '1' else
+		ru_out(0) xor k0 when sr56_sel   = '1' else ru_out(0);
     sr_in(1) <= nonce            when sr_load_en = '1' else
-		ru_out(1) xor k0 when sr12_sel   = '1' else ru_out(1); 
+		ru_out(1) xor k0 when sr56_sel   = '1' else ru_out(1); 
     sr_in(2) <= z0               when sr_load_en = '1' else
-		ru_out(2) xor k1 when sr12_sel   = '1' else ru_out(2); 
-    sr_in(3) <= k0               when sr_load_en = '1' else ru_out(3);
-    sr_in(4) <= z1               when sr_load_en = '1' else ru_out(4);
+		ru_out(2) xor k1 when sr56_sel   = '1' else ru_out(2); 
+    sr_in(3) <= k0               when sr_load_en = '1' else
+		ru_out(3) xor k0 when sr56_sel   = '1' else ru_out(3);
+    sr_in(4) <= z1               when sr_load_en = '1' else
+		ru_out(4) xor k0 when sr56_sel   = '1' else ru_out(4);
     sr_in(5) <= nonce xor k1     when sr_load_en = '1' else
-		ru_out(5) xor k0 when sr56_sel   = '1' else ru_out(5); 
+		ru_out(5) xor k1 when sr56_sel   = '1' else ru_out(5); 
     sr_in(6) <= (others => '0')  when sr_load_en = '1' else
 		ru_out(6) xor k1 when sr56_sel   = '1' else ru_out(6); 
 
@@ -94,13 +97,13 @@ begin
     ru_inter(0) <= sr_out;
     ru_gen : for i in 0 to (r-1) generate
         ru : entity roundupdate generic map (rf_conf, sb_conf, mc_conf) port map (
-            ru_inter(i), ru_inter(i+1), ru_aux_inter(i)(255 downto 128), ru_aux_inter(i)(127 downto 0)
+        ru_inter(i), ru_inter(i+1), ru_aux_inter(i)(255 downto 128), ru_aux_inter(i)(127 downto 0)
         );
     end generate;
     ru_out <= ru_inter(r);
 
     cont : entity controller generic map (r) port map (
-        clk, reset, last_block, ad_empty, msg_empty, sr_load_en, sr12_sel, sr56_sel, ru_aux_sel
+        clk, reset, last_block, ad_empty, msg_empty, sr_load_en, sr56_sel, ru_aux_sel
     );
 
     ctgen_gen : for i in 0 to (r-1) generate

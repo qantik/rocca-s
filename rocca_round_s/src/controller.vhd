@@ -13,7 +13,6 @@ entity controller is
         
           epoch      : out std_logic;
           sr_load_en : out std_logic;
-          sr12_sel   : out std_logic;
           sr56_sel   : out std_logic;
           ru_aux_sel : out std_logic_vector(1 downto 0));
 end entity;
@@ -62,7 +61,6 @@ begin
         count_en    <= '1';
         
         sr_load_en <= '0';
-        sr12_sel   <= '0';
         sr56_sel   <= '0';
         ru_aux_sel <= "00";
 
@@ -77,11 +75,11 @@ begin
             when init_state =>
                 next_state <= init_state;
 
-                if count = 30 then
-                    if ad_empty = '1' and msg_empty = '1' then
-                        sr12_sel <= '1';
-                    end if;
-                end if;
+                --if count = 30 then
+                --    if ad_empty = '1' and msg_empty = '1' then
+                --        sr12_sel <= '1';
+                --    end if;
+                --end if;
 
                 if count = 31 then
                     sr56_sel    <= '1';
@@ -101,9 +99,10 @@ begin
                 ru_aux_sel <= "01";
 
                 if count = 0 then
-                    if last_block = '1' and msg_empty = '1' then
-                        sr12_sel <= '1';
-                    end if;
+	            null;
+                    --if last_block = '1' and msg_empty = '1' then
+                    --    sr12_sel <= '1';
+                    --end if;
                 elsif count = 1 then
                     count_reset <= '1';
                     if last_block = '1' then
@@ -120,9 +119,10 @@ begin
                 ru_aux_sel <= "01";
 
                 if count = 0 then
-                    if last_block = '1' then
-                        sr12_sel <= '1';
-                    end if;
+                    null;
+                    --if last_block = '1' then
+                    --    sr12_sel <= '1';
+                    --end if;
                 elsif count = 1 then
                     count_reset <= '1';
                     if last_block = '1' then
