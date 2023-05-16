@@ -63,7 +63,7 @@ def absorbmsg(s, msg0, msg1, msglen, scheme=0):
 
 def outputtag(s, k0, k1, adlen, msglen):
     for i in range(16):
-        roundupdate(s, int2bytes(adlen*256, 128), int2bytes(msglen*256, 128))
+        roundupdate(s, int2bytes_litend(adlen*256, 128), int2bytes_litend(msglen*256, 128))
     return _xor(s[0], _xor(s[1], _xor(s[2], s[3]))) + _xor(s[4], _xor(s[5], s[6]))
 
 def encrypt(n, ad, msg, k):
@@ -84,9 +84,10 @@ def encrypt(n, ad, msg, k):
     t = outputtag(s, k0, k1, adlen, msglen) 
     return ct, t
 
-n     = int2bytes(0xAF803CE25906F1D19FB6C6804E06EA28, 128)
-# ad  = int2bytes(0x000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F, 256)
-msg0  = int2bytes(0xE4F90013FDA69FEF19D4602A4207CDD5A1016D070132613C659A8F5D33F3CB29, 256)
-msg1  = int2bytes(0x0B8CE73B8344B13A4F8E0915146984A1BB15FDEADEBE5B6AC09504464D8AAAAC, 256)
-k     = int2bytes(0xAB178F457AF6B493B7439EC6D4290062AB517A72E5C1D410CDD61754E4208450, 256)
-ct, t = encrypt(n, [], [msg0, msg1], k)
+#n     = int2bytes(0xAF803CE25906F1D19FB6C6804E06EA28, 128)
+#ad    = int2bytes(0x000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F, 256)
+#msg0  = int2bytes(0xE4F90013FDA69FEF19D4602A4207CDD5A1016D070132613C659A8F5D33F3CB29, 256)
+#msg1  = int2bytes(0x0B8CE73B8344B13A4F8E0915146984A1BB15FDEADEBE5B6AC09504464D8AAAAC, 256)
+#k     = int2bytes(0xAB178F457AF6B493B7439EC6D4290062AB517A72E5C1D410CDD61754E4208450, 256)
+# ct, t = encrypt(n, [], [msg0, msg1], k)
+# print(bytes2hex(t))

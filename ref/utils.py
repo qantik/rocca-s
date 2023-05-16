@@ -10,6 +10,14 @@ def int2bytes(x, bits):
     """
     return [ (x >> (8*i)) & 0xff for i in range(bits//8) ][::-1]
 
+def int2bytes_litend(x, bits):
+    """ Convert an integer of size 'bits' to an array of bytes in little endian order.
+
+    >>> int2bytes_litend(1024, 16)
+    [0, 32]
+    """
+    return [ (x >> (8*i)) & 0xff for i in range(bits//8) ]
+
 def bytes2int(b):
     """ Convert an array of byte values to a single integer.
 

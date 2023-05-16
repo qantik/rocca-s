@@ -19,6 +19,15 @@ entity rocca_unrolled_f_tb is
         end loop;
         return true;
     end function;
+    
+    function bytes_reorder(x : std_logic_vector) return std_logic_vector is
+        variable y : std_logic_vector(127 downto 0);
+    begin
+        for i in 0 to 15 loop
+            y((i+1)*8-1 downto i*8) := x((16-i)*8-1 downto (15-i)*8);
+        end loop;
+        return y;
+    end function;
 
 end entity;
 
@@ -107,8 +116,8 @@ begin
 	    key   <= v_key;
             data  <= (others => '0');
 
-            ad_len  <= std_logic_vector(to_unsigned(v_ad_len*256, ad_len'length));
-            msg_len <= std_logic_vector(to_unsigned(v_msg_len*256, msg_len'length));
+            ad_len  <= bytes_reorder(std_logic_vector(to_unsigned(v_ad_len*256, ad_len'length)));
+            msg_len <= bytes_reorder(std_logic_vector(to_unsigned(v_msg_len*256, msg_len'length)));
             if v_ad_len  > 0 then ad_empty  <= '0'; else ad_empty  <= '1'; end if;
             if v_msg_len > 0 then msg_empty <= '0'; else msg_empty <= '1'; end if;
             last_block <= '0';
