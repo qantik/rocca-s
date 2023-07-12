@@ -108,7 +108,7 @@ begin
 
     ctgen_gen : for i in 0 to (r-1) generate
         f0_gen : entity f0 generic map (rf_conf, sb_conf, mc_conf) port map(
-	    ru_inter(i+1), datai(i), cti(i)
+	    ru_inter(i), datai(i), cti(i)
         );
     end generate;
 

@@ -145,7 +145,8 @@ begin
                 if i = ((v_msg_len)/r)-1 then last_block <= '1'; else last_block <= '0'; end if;
                 wait for clk_period/2;
                 check_loop: for j in 0 to r-1 loop
-                    --assert vector_equal(ct((256*(j+1))-1 downto 256*j), v_ct_array(i*r+j)) report "wrong ct" severity failure;
+                    tmp := ct((256*(j+1))-1 downto 256*j);
+                    assert vector_equal(tmp, v_ct_array(i*r+j)) report "wrong ct" severity failure;
                 end loop;
             end loop;
             
